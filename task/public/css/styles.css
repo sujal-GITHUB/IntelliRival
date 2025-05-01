@@ -1,0 +1,67 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  header {
+    padding: 2rem 0;
+  }
+  
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-header {
+    border-radius: 10px 10px 0 0 !important;
+  }
+  
+  .badge.confidence-high {
+    background-color: #28a745;
+  }
+  
+  .badge.confidence-medium {
+    background-color: #17a2b8;
+  }
+  
+  .badge.confidence-low {
+    background-color: #6c757d;
+  }
+  
+  #loadingSection {
+    padding: 2rem 0;
+  }
+  
+  .progress {
+    height: 10px;
+    border-radius: 5px;
+  }
+  
+  .relationship-details {
+    border-left: 3px solid #17a2b8;
+    padding-left: 1rem;
+    margin: 1rem 0;
+  }
+  
+  #visualization {
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  
+  .node circle {
+    fill: #fff;
+    stroke: #17a2b8;
+    stroke-width: 3px;
+  }
+  
+  .node text {
+    font-size: 14px;
+  }
+  
+  .link {
+    fill: none;
+    stroke: #999;
+    stroke-opacity: 0.6;
+    stroke-width: 2px;
+  }
