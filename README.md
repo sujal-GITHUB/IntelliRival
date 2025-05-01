@@ -2,49 +2,41 @@
 
 A web application that analyzes which competitors of Infosys have worked with or are currently working with Virgin Media.
 
----
-
-## 🧠 Overview
+## Overview
 
 This tool simulates an AI-powered competitive intelligence system that scans publicly available information to find evidence of collaboration between **Virgin Media** and competitors of **Infosys**.
 
 The findings include:
 
-- ✅ Which competitors have worked with Virgin Media  
-- 🔍 The nature of their collaboration/relationship  
-- 🔗 Links to sources where the information was found  
-- 📊 Confidence level of the findings  
+- Which competitors have worked with Virgin Media  
+- The nature of their collaboration/relationship  
+- Links to sources where the information was found  
+- Confidence level of the findings  
 
----
+## Features
 
-## ✨ Features
+- Detailed analysis of competitor relationships  
+- Visual network graph of connections (via D3.js)  
+- Confidence ratings for each finding  
+- Links to source material for verification  
+- Responsive UI for all devices  
 
-- 📋 Detailed analysis of competitor relationships  
-- 🕸️ Visual network graph of connections (via D3.js)  
-- 📈 Confidence ratings for each finding  
-- 🔗 Links to source material for verification  
-- 📱 Responsive UI for all devices  
-
----
-
-## 🏗️ Architecture
+## Architecture
 
 ### Backend
 
-- 🛠️ **Node.js + Express** for server-side logic  
-- 🔎 Simulated web scraping and data analysis  
-- 🌐 RESTful API endpoint for retrieving competitor analysis  
+- **Node.js + Express** for server-side logic  
+- Simulated web scraping and data analysis  
+- RESTful API endpoint for retrieving competitor analysis  
 
 ### Frontend
 
-- 🎨 **HTML/CSS + Bootstrap** for responsive layout  
-- 📜 JavaScript for interactivity  
-- 📊 **D3.js** for graph visualization  
-- 🧩 EJS templating for dynamic server-side rendering  
+- **HTML/CSS + Bootstrap** for responsive layout  
+- JavaScript for interactivity  
+- **D3.js** for graph visualization  
+- EJS templating for dynamic server-side rendering  
 
----
-
-## 📁 Project Structure
+## Project Structure
 
 infosys-competitor-analysis/
 ├── server.js              # Main application entry point
@@ -62,41 +54,33 @@ infosys-competitor-analysis/
     ├── index.ejs          # Home page template
     └── results.ejs        # Results page template
 
-## 🧪 Technical Approach
+## Technical Approach
 
 - **Data Collection**: Simulated web scraping/API queries for competitor relationships  
 - **Data Analysis**: Assigns confidence levels and extracts relationship context  
 - **Visualization**: Interactive D3.js network graph  
 - **UI**: Responsive EJS + Bootstrap frontend for easy navigation and insights  
 
----
+## Technical Decisions
 
-## ⚙️ Technical Decisions
+- Simulated data used for demo; real scraping or APIs can be plugged in later  
+- D3.js chosen for powerful, flexible graph rendering  
+- EJS for clean templating with Express  
+- Bootstrap for quick, responsive design
+  
+## Future Enhancements
 
-- 🧪 Simulated data used for demo; real scraping or APIs can be plugged in later  
-- 📊 D3.js chosen for powerful, flexible graph rendering  
-- 🧩 EJS for clean templating with Express  
-- 💻 Bootstrap for quick, responsive design  
+- Real-time web scraping from sources like press releases and news sites  
+- AI/NLP analysis to extract relationship sentiment and strength  
+- User login with saved analysis sessions  
+- Export options (PDF, CSV, CRM integration)  
+- Multi-company analysis capabilities  
 
----
-
-## 🔮 Future Enhancements
-
-- 🌍 Real-time web scraping from sources like press releases and news sites  
-- 🧠 AI/NLP analysis to extract relationship sentiment and strength  
-- 👤 User login with saved analysis sessions  
-- 📤 Export options (PDF, CSV, CRM integration)  
-- 🏢 Multi-company analysis capabilities  
-
----
-
-## 🪪 License
+## License
 
 This project is licensed under the **MIT License**.
 
----
-
-## 🙌 Acknowledgements
+## Acknowledgements
 
 - **Node.js, Express, and EJS**  
 - **D3.js** for data visualization  
