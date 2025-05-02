@@ -1,0 +1,154 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  header {
+    padding: 2rem 0;
+  }
+  
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border-bottom: 0;
+    padding: 1rem 1.25rem;
+  }
+  
+  .card-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+  
+  .badge.confidence-high {
+    background-color: #28a745;
+  }
+  
+  .badge.confidence-medium {
+    background-color: #17a2b8;
+  }
+  
+  .badge.confidence-low {
+    background-color: #6c757d;
+  }
+  
+  #loadingSection {
+    padding: 2rem 0;
+  }
+  
+  .progress {
+    height: 10px;
+    border-radius: 5px;
+  }
+  
+  .relationship-details {
+    border-left: 3px solid #17a2b8;
+    padding-left: 1rem;
+    margin: 1rem 0;
+  }
+  
+  #visualization {
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  
+  .node circle {
+    fill: #fff;
+    stroke: #17a2b8;
+    stroke-width: 3px;
+  }
+  
+  .node text {
+    font-size: 14px;
+  }
+  
+  .link {
+    fill: none;
+    stroke: #999;
+    stroke-opacity: 0.6;
+    stroke-width: 2px;
+  }
+
+  .list-unstyled li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Timeline scrollbar styling */
+  div::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  div::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  div::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  div::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* Competitor card styling */
+  .competitor-card {
+    transition: transform 0.2s;
+  }
+  
+  .competitor-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Statistics highlight */
+  .list-unstyled strong {
+    color: #0d6efd;
+  }
+
+  .card canvas {
+    max-height: 300px;
+    width: 100% !important;
+  }
+
+  .company-card {
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+  }
+
+  .company-header {
+    cursor: pointer;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .company-header:hover {
+    background-color: #e9ecef;
+  }
+
+  .findings-container {
+    padding: 1rem;
+  }
+
+  .finding-count {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .spinner-custom {
+    color: rgb(226, 155, 0) !important;
+  }
+
+  .spinner-custom .spinner-border {
+    border-right-color: transparent;
+  }
