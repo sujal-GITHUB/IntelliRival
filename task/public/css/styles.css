@@ -9,12 +9,19 @@ body {
   
   .card {
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     margin-bottom: 1.5rem;
   }
   
   .card-header {
     border-radius: 10px 10px 0 0 !important;
+    border-bottom: 0;
+    padding: 1rem 1.25rem;
+  }
+  
+  .card-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
   }
   
   .badge.confidence-high {
@@ -64,4 +71,52 @@ body {
     stroke: #999;
     stroke-opacity: 0.6;
     stroke-width: 2px;
+  }
+
+  .list-unstyled li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Timeline scrollbar styling */
+  div::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  div::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  div::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  div::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* Competitor card styling */
+  .competitor-card {
+    transition: transform 0.2s;
+  }
+  
+  .competitor-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Statistics highlight */
+  .list-unstyled strong {
+    color: #0d6efd;
+  }
+
+  .card canvas {
+    max-height: 300px;
+    width: 100% !important;
+  }
+
+  .chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
   }

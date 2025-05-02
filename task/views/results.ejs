@@ -3,68 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>Direct Results View</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .debug-info {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .competitor-card {
+      margin-bottom: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    }
+    .competitor-header {
+      background-color: #f1f8ff;
+      padding: 1rem;
+      border-radius: 0.5rem 0.5rem 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .finding-body {
+      padding: 1.5rem;
+    }
+    .high-confidence {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-left: 5px solid #28a745;
+    }
+    .medium-confidence {
+      background-color: rgba(23, 162, 184, 0.1);
+      border-left: 5px solid #17a2b8;
+    }
+    .low-confidence {
+      background-color: rgba(108, 117, 125, 0.1);
+      border-left: 5px solid #6c757d;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <header class="my-4 text-center">
-      <h1><%= title %></h1>
-      <p class="lead">Competitors of <%= company %> working with <%= target %></p>
+  <div class="container my-5">
+    <header class="text-center mb-5">
+      <h1>Virgin Media Competitor Analysis</h1>
+      <p class="lead">Direct results view showing Infosys competitors working with Virgin Media</p>
     </header>
 
-    <div class="row mb-4">
-      <div class="col-md-8 mx-auto">
-        <div class="alert alert-info">
-          <h4 class="alert-heading">Analysis Summary</h4>
-          <p><strong>Target Account:</strong> <%= target %></p>
-          <p><strong>Found Competitor Relationships:</strong> <span id="relationshipCount">0</span></p>
+    <div class="container my-5">
+      <!-- Analysis Summary Section -->
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h3 class="mb-0">Analysis Summary</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <!-- Summary Statistics -->
+                <div class="col-md-3">
+                  <h5>Summary Statistics</h5>
+                  <ul class="list-unstyled">
+                    <li>Total competitors: <strong><%= data.analysis.overview.totalCompetitors %></strong></li>
+                    <li>With findings: <strong><%= data.analysis.overview.competitorsFound %></strong></li>
+                    <li>High confidence: <strong><%= data.analysis.overview.highConfidenceFindings %></strong></li>
+                  </ul>
+                </div>
+
+                <!-- Top Technologies -->
+                <div class="col-md-3">
+                  <h5>Top Technologies</h5>
+                  <ul class="list-unstyled">
+                    <% data.analysis.metrics.topTechnologies.forEach(tech => { %>
+                      <li><%= tech.tech %>: <strong><%= tech.count %></strong> mentions</li>
+                    <% }); %>
+                  </ul>
+                </div>
+
+                <!-- Relationship Types -->
+                <div class="col-md-3">
+                  <h5>Relationship Types</h5>
+                  <ul class="list-unstyled">
+                    <% data.analysis.metrics.relationshipTypes.forEach(type => { %>
+                      <li><%= type.type %>: <strong><%= type.count %></strong></li>
+                    <% }); %>
+                  </ul>
+                </div>
+
+                <!-- Timeline -->
+                <div class="col-md-3">
+                  <h5>Timeline Analysis</h5>
+                  <div style="max-height: 200px; overflow-y: auto;">
+                    <ul class="list-unstyled">
+                      <% data.analysis.metrics.timeline.forEach(year => { %>
+                        <li><%= year.year %>: <strong><%= year.count %></strong> activities</li>
+                      <% }); %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Visualization</h5>
+
+      <!-- Charts Section -->
+      <div class="row mb-5">
+        <!-- Top Competitors Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header bg-info text-white">
+              <h3 class="mb-0">Top Competitors by Strength</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="competitorsChart"></canvas>
+            </div>
           </div>
-          <div class="card-body">
-            <div id="visualization" style="height: 400px;"></div>
+        </div>
+
+        <!-- Technologies Distribution Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header bg-success text-white">
+              <h3 class="mb-0">Technologies Distribution</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="technologiesChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+              <h3 class="mb-0">Activity Timeline</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="timelineChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Relationship Types Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+              <h3 class="mb-0">Relationship Types</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="relationshipChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Top Competitors Section -->
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h3 class="mb-0">Top Competitors by Relationship Strength</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <% data.analysis.insights.strongestCompetitors.forEach(competitor => { %>
+                  <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <h5 class="card-title"><%= competitor.name %></h5>
+                        <ul class="list-unstyled">
+                          <li>Strength Score: <strong><%= competitor.strength %></strong></li>
+                          <li>Total Findings: <strong><%= competitor.findings %></strong></li>
+                          <li>High Confidence: <strong><%= competitor.highConfidence %></strong></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing results container -->
+      <div id="competitorResults">
+        <!-- ... existing results content ... -->
+      </div>
     </div>
-    
-    <div id="competitorResults"></div>
-    
-    <div class="text-center mt-4 mb-5">
-      <a href="/" class="btn btn-outline-primary">Run Another Analysis</a>
+
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <!-- Debug information -->
+        <div class="debug-info mb-4">
+          <h3>Analysis Information</h3>
+          <p><strong>Target company:</strong> Virgin Media</p>
+          <p><strong>Client:</strong> Infosys</p>
+          <div id="status-message">Loading results...</div>
+        </div>
+
+        <!-- Results container -->
+        <div id="results-container">
+          <!-- Results will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="text-center mt-5">
+          <a href="/" class="btn btn-primary">Back to Home</a>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Result Item Template -->
-  <template id="resultItemTemplate">
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="competitor-name mb-0"></h5>
-        <span class="badge confidence-badge"></span>
-      </div>
-      <div class="card-body">
-        <h6 class="finding-title"></h6>
-        <p class="finding-snippet"></p>
-        <div class="relationship-details">
-          <p><strong>Type of Relationship:</strong> <span class="relationship-type"></span></p>
-          <p><strong>Timeframe:</strong> <span class="relationship-year"></span></p>
-        </div>
-        <a href="#" class="source-link btn btn-sm btn-outline-primary" target="_blank">View Source</a>
-      </div>
-    </div>
-  </template>
+  <script>
+    function initializeCharts(data) {
+        // Top Competitors Chart
+        new Chart(document.getElementById('competitorsChart'), {
+            type: 'bar',
+            data: {
+                labels: data.analysis.insights.strongestCompetitors.map(c => c.name),
+                datasets: [{
+                    label: 'Strength Score',
+                    data: data.analysis.insights.strongestCompetitors.map(c => c.strength),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script src="/js/results.js"></script>
+        // Technologies Chart
+        new Chart(document.getElementById('technologiesChart'), {
+            type: 'pie',
+            data: {
+                labels: data.analysis.metrics.topTechnologies.map(t => t.tech),
+                datasets: [{
+                    data: data.analysis.metrics.topTechnologies.map(t => t.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Timeline Chart
+        new Chart(document.getElementById('timelineChart'), {
+            type: 'line',
+            data: {
+                labels: data.analysis.metrics.timeline.map(t => t.year),
+                datasets: [{
+                    label: 'Activities',
+                    data: data.analysis.metrics.timeline.map(t => t.count),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Relationship Types Chart
+        new Chart(document.getElementById('relationshipChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.analysis.metrics.relationshipTypes.map(r => r.type),
+                datasets: [{
+                    data: data.analysis.metrics.relationshipTypes.map(r => r.count),
+                    backgroundColor: [
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+
+    // Add this to your existing DOMContentLoaded event handler
+    document.addEventListener('DOMContentLoaded', async () => {
+        const resultsContainer = document.getElementById('results-container');
+        const statusMessage = document.getElementById('status-message');
+        
+        try {
+          statusMessage.innerHTML = 'Fetching analysis results...';
+          
+          // Fetch the results from the API
+          const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              targetCompany: 'Virgin Media'
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+          }
+          
+          const data = await response.json();
+          console.log('API response:', data);
+          
+          if (!data.results || !Array.isArray(data.results)) {
+            throw new Error('Invalid results format received from server');
+          }
+          
+          // Update status message
+          statusMessage.innerHTML = `<div class="alert alert-success">
+            Analysis complete! Found ${data.results.length} competitors with relationships to Virgin Media.
+          </div>`;
+          
+          // Display results
+          if (data.results.length === 0) {
+            resultsContainer.innerHTML = '<div class="alert alert-info">No competitor relationships found.</div>';
+            return;
+          }
+          
+          // Render each result
+          data.results.forEach(result => {
+            const { competitor, findings } = result;
+            
+            findings.forEach(finding => {
+              const confidenceClass = finding.confidence === 'High' ? 'high-confidence' : 
+                                     finding.confidence === 'Medium' ? 'medium-confidence' : 'low-confidence';
+              
+              const cardElement = document.createElement('div');
+              cardElement.className = `competitor-card ${confidenceClass}`;
+              
+              cardElement.innerHTML = `
+                <div class="competitor-header">
+                  <h3>${competitor}</h3>
+                  <span class="badge bg-${finding.confidence === 'High' ? 'success' : 
+                                          finding.confidence === 'Medium' ? 'info' : 'secondary'}">
+                    ${finding.confidence} Confidence
+                  </span>
+                </div>
+                <div class="finding-body">
+                  <h4>${finding.title}</h4>
+                  <p class="lead">${finding.snippet}</p>
+                  <div class="mt-4">
+                    <p><strong>Relationship Type:</strong> ${finding.relationship}</p>
+                    <p><strong>Timeframe:</strong> ${finding.year}</p>
+                  </div>
+                  <a href="${finding.link}" class="btn btn-outline-primary mt-3" target="_blank">
+                    View Source
+                  </a>
+                </div>
+              `;
+              
+              resultsContainer.appendChild(cardElement);
+            });
+          });
+
+          // After fetching data and before rendering results
+          if (data.results && data.analysis) {
+              initializeCharts(data);
+          }
+          
+        } catch (error) {
+          console.error('Error:', error);
+          statusMessage.innerHTML = `
+            <div class="alert alert-danger">
+              <strong>Error:</strong> ${error.message}
+            </div>
+          `;
+        }
+    });
+  </script>
 </body>
 </html>

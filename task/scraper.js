@@ -1,89 +1,99 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
 require('dotenv').config();
 
-// Function to search Google for relationship between competitor and target company
-async function searchCompetitorRelationship(competitor, targetCompany) {
-    try {
-      const searchTerm = `${competitor.name} working with ${targetCompany} partnership case study`;
-      const encodedSearch = encodeURIComponent(searchTerm);
-  
-      const searchUrl = `https://serpapi.com/search.json?q=${encodedSearch}&api_key=${process.env.SERPAPI_KEY}`;
-      console.log(`Searching for: ${searchTerm}`);
-  
-      const response = await axios.get(searchUrl);
-      const searchResults = response.data.organic_results || [];
-  
-      return searchResults.map(result => ({
-        title: result.title,
-        link: result.link,
-        snippet: result.snippet
-      }));
-    } catch (error) {
-      console.error(`Error searching for ${competitor.name} + ${targetCompany}:`, error.message);
-      return [];
-    }
-  }
+const SERP_API_KEY = process.env.SERPAPI_KEY;
 
-// Function to extract text from a web page
-async function extractContentFromUrl(url) {
+async function searchCompetitorRelationship(competitor, targetCompany) {
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      },
-      timeout: 5000
+    console.log(`Searching relationship between ${competitor.name} and ${targetCompany}`);
+    console.log('-----------------------------------');
+    
+    const query = encodeURIComponent(`${competitor.name} working with ${targetCompany} partnership case study`);
+    const url = `https://serpapi.com/search.json?engine=google&q=${query}&api_key=${SERP_API_KEY}`;
+
+    const response = await axios.get(url);
+    const results = response.data.organic_results || [];
+
+    const searchResults = results.map(result => {
+      const content = (result.snippet || '') + ' ' + (result.title || '');
+      const searchResult = {
+        title: result.title || 'No title available',
+        snippet: result.snippet || 'No snippet available',
+        link: result.link || 'No link available',
+        confidence: determineConfidence(result, competitor.name, targetCompany),
+        year: extractYear(content) || 'Year not found',
+        technologies: extractTechnologies(content).length > 0 ? 
+          extractTechnologies(content) : ['No specific technologies mentioned'],
+        relationship: findRelationshipType(content)
+      };
+
+      return searchResult;
     });
-    
-    const $ = cheerio.load(response.data);
-    
-    // Extract text content from main content areas
-    const bodyText = $('body').text();
-    const mainContent = bodyText.replace(/\\s+/g, ' ').trim();
-    
-    return mainContent;
+
+    if (searchResults.length === 0) {
+      console.log('\nNo results found');
+    }
+
+    return searchResults;
+
   } catch (error) {
-    console.error(`Error extracting content from ${url}:`, error.message);
-    return null;
+    console.error(`\nSearch error for ${competitor.name}:`, error.message);
+    return [];
   }
 }
 
-// Function to analyze content for a relationship
-function analyzeContent(content, competitor, targetCompany) {
-  if (!content) return null;
+function determineConfidence(result, competitorName, targetCompany) {
+  const content = (result.snippet || '') + (result.title || '');
+  const hasCompetitor = content.toLowerCase().includes(competitorName.toLowerCase());
+  const hasTarget = content.toLowerCase().includes(targetCompany.toLowerCase());
+  const hasPartnership = /partnership|collaboration|agreement|contract|case study/i.test(content);
+
+  if (hasCompetitor && hasTarget && hasPartnership) {
+    return "High";
+  } else if (hasCompetitor && hasTarget) {
+    return "Medium";
+  }
+  return "Low";
+}
+
+function findRelationshipType(content) {
+  if (typeof content !== 'string' || !content) return 'Unknown';
   
-  // Check if content contains both company names within close proximity
-  const competitorRegex = new RegExp(`\\b${competitor.name}\\b|\\b${competitor.shortName}\\b`, 'i');
-  const targetRegex = new RegExp(`\\b${targetCompany}\\b`, 'i');
-  
-  const hasCompetitor = competitorRegex.test(content);
-  const hasTarget = targetRegex.test(content);
-  
-  // Check for relationship indicators
-  const relationshipTerms = [
-    'partnership', 'client', 'collaboration', 'project', 'engagement',
-    'contract', 'agreement', 'work with', 'working with', 'case study',
-    'success story', 'implementation', 'transformation', 'solution'
-  ];
-  
-  let relationshipFound = false;
-  let relationshipType = '';
-  
-  if (hasCompetitor && hasTarget) {
-    for (const term of relationshipTerms) {
-      if (content.toLowerCase().includes(term)) {
-        relationshipFound = true;
-        relationshipType = term;
-        break;
-      }
-    }
+  const types = {
+    'strategic partnership': /strategic\s+partner(ship)?/i,
+    'implementation partner': /implementation\s+partner/i,
+    'service provider': /service\s+provider/i,
+    'technology partner': /technology\s+partner/i,
+    'consulting partner': /consulting\s+partner/i,
+    'system integrator': /system\s+integrator/i
+  };
+
+  for (const [type, regex] of Object.entries(types)) {
+    if (regex.test(content)) return type;
   }
   
-  return relationshipFound ? relationshipType : null;
+  return 'Business Relationship';
+}
+
+function extractYear(content) {
+  if (typeof content !== 'string' || !content) return null;
+  const yearRegex = /(20[0-2][0-9])/g;
+  const years = content.match(yearRegex);
+  return years ? Math.max(...years) : null;
+}
+
+function extractTechnologies(content) {
+  if (typeof content !== 'string' || !content) return [];
+  
+  const techKeywords = [
+    'AWS', 'Azure', 'Cloud', 'AI', 'ML', 'Blockchain',
+    'DevOps', '5G', 'IoT', 'Analytics', 'Digital Transformation'
+  ];
+  
+  return techKeywords
+    .filter(tech => new RegExp(`\\b${tech}\\b`, 'i').test(content));
 }
 
 module.exports = {
-  searchCompetitorRelationship,
-  extractContentFromUrl,
-  analyzeContent
+  searchCompetitorRelationship
 };
