@@ -16,18 +16,18 @@ async function searchCompetitorRelationship(competitor, targetCompany) {
 
     const searchResults = results.map(result => {
       const content = (result.snippet || '') + ' ' + (result.title || '');
-      const searchResult = {
+      const contentYear = extractYear(content);
+      
+      return {
         title: result.title || 'No title available',
         snippet: result.snippet || 'No snippet available',
         link: result.link || 'No link available',
         confidence: determineConfidence(result, competitor.name, targetCompany),
-        year: extractYear(content) || 'Year not found',
-        technologies: extractTechnologies(content).length > 0 ? 
-          extractTechnologies(content) : ['No specific technologies mentioned'],
-        relationship: findRelationshipType(content)
+        year: contentYear || extractPublicationDate(result),
+        technologies: extractTechnologies(content),
+        relationship: findRelationshipType(content),
+        published_date: result.published_date || null
       };
-
-      return searchResult;
     });
 
     if (searchResults.length === 0) {
@@ -94,6 +94,32 @@ function extractTechnologies(content) {
     .filter(tech => new RegExp(`\\b${tech}\\b`, 'i').test(content));
 }
 
+// Add this function alongside other extraction functions
+function extractPublicationDate(result) {
+    // Check for the 'published' field from search results
+    if (result.published_date) {
+        const date = new Date(result.published_date);
+        if (!isNaN(date)) {
+            return date.getFullYear().toString();
+        }
+    }
+
+    // Check for date in snippet using regex
+    const dateRegex = /\b(20\d{2})\b/;  // Matches years from 2000-2099
+    const snippetMatch = result.snippet?.match(dateRegex);
+    if (snippetMatch) {
+        return snippetMatch[1];
+    }
+
+    return 'Year not found';
+}
+
+// Update the exports at the bottom of scraper.js
 module.exports = {
-  searchCompetitorRelationship
+    searchCompetitorRelationship,
+    extractPublicationDate,
+    determineConfidence,
+    findRelationshipType,
+    extractYear,
+    extractTechnologies
 };

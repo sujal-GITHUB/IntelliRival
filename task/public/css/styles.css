@@ -115,8 +115,40 @@ body {
     width: 100% !important;
   }
 
-  .chart-container {
-    position: relative;
-    margin: auto;
-    height: 300px;
+  .company-card {
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+  }
+
+  .company-header {
+    cursor: pointer;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .company-header:hover {
+    background-color: #e9ecef;
+  }
+
+  .findings-container {
+    padding: 1rem;
+  }
+
+  .finding-count {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .spinner-custom {
+    color: rgb(226, 155, 0) !important;
+  }
+
+  .spinner-custom .spinner-border {
+    border-right-color: transparent;
   }

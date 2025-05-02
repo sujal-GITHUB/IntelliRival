@@ -162,18 +162,27 @@ function getTopTechnologies(results) {
 }
 
 function analyzeTimeline(results) {
-  const timeline = {};
-  results.forEach(result => {
-    result.findings.forEach(finding => {
-      if (finding.year) {
-        timeline[finding.year] = (timeline[finding.year] || 0) + 1;
-      }
+    const timeline = {};
+    const currentYear = new Date().getFullYear();
+
+    results.forEach(result => {
+        result.findings.forEach(finding => {
+            let year = finding.year;
+            
+            // Skip invalid years or years too far in the future
+            if (year && !isNaN(year) && year <= currentYear + 1) {
+                timeline[year] = (timeline[year] || 0) + 1;
+            } else {
+                timeline['Year not found'] = (timeline['Year not found'] || 0) + 1;
+            }
+        });
     });
-  });
-  
-  return Object.entries(timeline)
-    .sort(([a], [b]) => b - a)
-    .map(([year, count]) => ({ year, count }));
+    
+    return Object.entries(timeline)
+        .filter(([year]) => year !== 'Year not found') // Put "Year not found" at the end
+        .sort(([a], [b]) => b - a)
+        .concat([['Year not found', timeline['Year not found'] || 0]])
+        .map(([year, count]) => ({ year, count }));
 }
 
 function analyzeRelationshipTypes(results) {
@@ -293,6 +302,26 @@ function calculateCompetitorStrengths(results) {
       highConfidence: result.findings.filter(f => f.confidence === 'High').length
     }))
     .sort((a, b) => b.strength - a.strength);
+}
+
+// Add this helper function near the other date-related functions
+function extractPublicationDate(result) {
+    // Check for the 'published' field from search results
+    if (result.published_date) {
+        const date = new Date(result.published_date);
+        if (!isNaN(date)) {
+            return date.getFullYear();
+        }
+    }
+
+    // Check for date in snippet using regex
+    const dateRegex = /\b(20\d{2})\b/;  // Matches years from 2000-2099
+    const snippetMatch = result.snippet?.match(dateRegex);
+    if (snippetMatch) {
+        return parseInt(snippetMatch[1]);
+    }
+
+    return 'Year not found';
 }
 
 module.exports = {

@@ -6,44 +6,62 @@
   <title>Direct Results View</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <style>
-    .debug-info {
-      background-color: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 0.25rem;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    .competitor-card {
+    .company-card {
       margin-bottom: 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .competitor-header {
-      background-color: #f1f8ff;
-      padding: 1rem;
-      border-radius: 0.5rem 0.5rem 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+
+    .company-header {
+      cursor: pointer;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid rgba(0,0,0,.125);
+      transition: background-color 0.3s;
     }
-    .finding-body {
-      padding: 1.5rem;
+
+    .company-header:hover {
+      background-color: #e9ecef;
     }
-    .high-confidence {
-      background-color: rgba(40, 167, 69, 0.1);
-      border-left: 5px solid #28a745;
+
+    .findings-stack .finding-card {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      margin-bottom: 0;
+      border-bottom: 1px solid rgba(0,0,0,.125);
     }
-    .medium-confidence {
-      background-color: rgba(23, 162, 184, 0.1);
-      border-left: 5px solid #17a2b8;
+
+    .findings-stack .finding-card:last-child {
+      border-bottom: none;
     }
-    .low-confidence {
-      background-color: rgba(108, 117, 125, 0.1);
-      border-left: 5px solid #6c757d;
+
+    .findings-stack {
+      border: 1px solid rgba(0,0,0,.125);
+      border-top: none;
+    }
+
+    .confidence-indicator {
+      width: 4px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+    }
+
+    .high-confidence .confidence-indicator {
+      background-color: #198754;
+    }
+
+    .medium-confidence .confidence-indicator {
+      background-color: #0dcaf0;
+    }
+
+    .low-confidence .confidence-indicator {
+      background-color: #6c757d;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container my-5">
@@ -51,149 +69,6 @@
       <h1>Virgin Media Competitor Analysis</h1>
       <p class="lead">Direct results view showing Infosys competitors working with Virgin Media</p>
     </header>
-
-    <div class="container my-5">
-      <!-- Analysis Summary Section -->
-      <div class="row mb-5">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-header bg-primary text-white">
-              <h3 class="mb-0">Analysis Summary</h3>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <!-- Summary Statistics -->
-                <div class="col-md-3">
-                  <h5>Summary Statistics</h5>
-                  <ul class="list-unstyled">
-                    <li>Total competitors: <strong><%= data.analysis.overview.totalCompetitors %></strong></li>
-                    <li>With findings: <strong><%= data.analysis.overview.competitorsFound %></strong></li>
-                    <li>High confidence: <strong><%= data.analysis.overview.highConfidenceFindings %></strong></li>
-                  </ul>
-                </div>
-
-                <!-- Top Technologies -->
-                <div class="col-md-3">
-                  <h5>Top Technologies</h5>
-                  <ul class="list-unstyled">
-                    <% data.analysis.metrics.topTechnologies.forEach(tech => { %>
-                      <li><%= tech.tech %>: <strong><%= tech.count %></strong> mentions</li>
-                    <% }); %>
-                  </ul>
-                </div>
-
-                <!-- Relationship Types -->
-                <div class="col-md-3">
-                  <h5>Relationship Types</h5>
-                  <ul class="list-unstyled">
-                    <% data.analysis.metrics.relationshipTypes.forEach(type => { %>
-                      <li><%= type.type %>: <strong><%= type.count %></strong></li>
-                    <% }); %>
-                  </ul>
-                </div>
-
-                <!-- Timeline -->
-                <div class="col-md-3">
-                  <h5>Timeline Analysis</h5>
-                  <div style="max-height: 200px; overflow-y: auto;">
-                    <ul class="list-unstyled">
-                      <% data.analysis.metrics.timeline.forEach(year => { %>
-                        <li><%= year.year %>: <strong><%= year.count %></strong> activities</li>
-                      <% }); %>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts Section -->
-      <div class="row mb-5">
-        <!-- Top Competitors Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
-            <div class="card-header bg-info text-white">
-              <h3 class="mb-0">Top Competitors by Strength</h3>
-            </div>
-            <div class="card-body">
-              <canvas id="competitorsChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Technologies Distribution Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
-            <div class="card-header bg-success text-white">
-              <h3 class="mb-0">Technologies Distribution</h3>
-            </div>
-            <div class="card-body">
-              <canvas id="technologiesChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Timeline Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
-            <div class="card-header bg-primary text-white">
-              <h3 class="mb-0">Activity Timeline</h3>
-            </div>
-            <div class="card-body">
-              <canvas id="timelineChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Relationship Types Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
-            <div class="card-header bg-warning text-dark">
-              <h3 class="mb-0">Relationship Types</h3>
-            </div>
-            <div class="card-body">
-              <canvas id="relationshipChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Top Competitors Section -->
-      <div class="row mb-5">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-header bg-success text-white">
-              <h3 class="mb-0">Top Competitors by Relationship Strength</h3>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <% data.analysis.insights.strongestCompetitors.forEach(competitor => { %>
-                  <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <h5 class="card-title"><%= competitor.name %></h5>
-                        <ul class="list-unstyled">
-                          <li>Strength Score: <strong><%= competitor.strength %></strong></li>
-                          <li>Total Findings: <strong><%= competitor.findings %></strong></li>
-                          <li>High Confidence: <strong><%= competitor.highConfidence %></strong></li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                <% }); %>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Existing results container -->
-      <div id="competitorResults">
-        <!-- ... existing results content ... -->
-      </div>
-    </div>
 
     <div class="row">
       <div class="col-lg-8 mx-auto">
@@ -218,196 +93,152 @@
   </div>
 
   <script>
-    function initializeCharts(data) {
-        // Top Competitors Chart
-        new Chart(document.getElementById('competitorsChart'), {
-            type: 'bar',
-            data: {
-                labels: data.analysis.insights.strongestCompetitors.map(c => c.name),
-                datasets: [{
-                    label: 'Strength Score',
-                    data: data.analysis.insights.strongestCompetitors.map(c => c.strength),
-                    backgroundColor: 'rgba(54, 162, 235, 0.8)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // Technologies Chart
-        new Chart(document.getElementById('technologiesChart'), {
-            type: 'pie',
-            data: {
-                labels: data.analysis.metrics.topTechnologies.map(t => t.tech),
-                datasets: [{
-                    data: data.analysis.metrics.topTechnologies.map(t => t.count),
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-            }
-        });
-
-        // Timeline Chart
-        new Chart(document.getElementById('timelineChart'), {
-            type: 'line',
-            data: {
-                labels: data.analysis.metrics.timeline.map(t => t.year),
-                datasets: [{
-                    label: 'Activities',
-                    data: data.analysis.metrics.timeline.map(t => t.count),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-
-        // Relationship Types Chart
-        new Chart(document.getElementById('relationshipChart'), {
-            type: 'doughnut',
-            data: {
-                labels: data.analysis.metrics.relationshipTypes.map(r => r.type),
-                datasets: [{
-                    data: data.analysis.metrics.relationshipTypes.map(r => r.count),
-                    backgroundColor: [
-                        'rgba(255, 159, 64, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-            }
-        });
-    }
-
-    // Add this to your existing DOMContentLoaded event handler
     document.addEventListener('DOMContentLoaded', async () => {
         const resultsContainer = document.getElementById('results-container');
         const statusMessage = document.getElementById('status-message');
         
         try {
-          statusMessage.innerHTML = 'Fetching analysis results...';
-          
-          // Fetch the results from the API
-          const response = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              targetCompany: 'Virgin Media'
-            })
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
-          }
-          
-          const data = await response.json();
-          console.log('API response:', data);
-          
-          if (!data.results || !Array.isArray(data.results)) {
-            throw new Error('Invalid results format received from server');
-          }
-          
-          // Update status message
-          statusMessage.innerHTML = `<div class="alert alert-success">
-            Analysis complete! Found ${data.results.length} competitors with relationships to Virgin Media.
-          </div>`;
-          
-          // Display results
-          if (data.results.length === 0) {
-            resultsContainer.innerHTML = '<div class="alert alert-info">No competitor relationships found.</div>';
-            return;
-          }
-          
-          // Render each result
-          data.results.forEach(result => {
-            const { competitor, findings } = result;
+            statusMessage.innerHTML = 'Fetching analysis results...';
             
-            findings.forEach(finding => {
-              const confidenceClass = finding.confidence === 'High' ? 'high-confidence' : 
-                                     finding.confidence === 'Medium' ? 'medium-confidence' : 'low-confidence';
-              
-              const cardElement = document.createElement('div');
-              cardElement.className = `competitor-card ${confidenceClass}`;
-              
-              cardElement.innerHTML = `
-                <div class="competitor-header">
-                  <h3>${competitor}</h3>
-                  <span class="badge bg-${finding.confidence === 'High' ? 'success' : 
-                                          finding.confidence === 'Medium' ? 'info' : 'secondary'}">
-                    ${finding.confidence} Confidence
-                  </span>
-                </div>
-                <div class="finding-body">
-                  <h4>${finding.title}</h4>
-                  <p class="lead">${finding.snippet}</p>
-                  <div class="mt-4">
-                    <p><strong>Relationship Type:</strong> ${finding.relationship}</p>
-                    <p><strong>Timeframe:</strong> ${finding.year}</p>
-                  </div>
-                  <a href="${finding.link}" class="btn btn-outline-primary mt-3" target="_blank">
-                    View Source
-                  </a>
-                </div>
-              `;
-              
-              resultsContainer.appendChild(cardElement);
+            // Fetch the results from the API
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    targetCompany: 'Virgin Media'
+                })
             });
-          });
+            
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('API response:', data);
+            
+            if (!data.results || !Array.isArray(data.results)) {
+                throw new Error('Invalid results format received from server');
+            }
+            
+            // Update status message
+            statusMessage.innerHTML = `<div class="alert alert-success">
+              Analysis complete! Found ${data.results.length} competitors with relationships to Virgin Media.
+            </div>`;
+            
+            // Display results
+            if (data.results.length === 0) {
+                resultsContainer.innerHTML = '<div class="alert alert-info">No competitor relationships found.</div>';
+                return;
+            }
+            
+            // Use the new render function
+            renderResults(data);
 
-          // After fetching data and before rendering results
-          if (data.results && data.analysis) {
-              initializeCharts(data);
-          }
-          
         } catch (error) {
-          console.error('Error:', error);
-          statusMessage.innerHTML = `
-            <div class="alert alert-danger">
-              <strong>Error:</strong> ${error.message}
-            </div>
-          `;
+            console.error('Error:', error);
+            statusMessage.innerHTML = `
+              <div class="alert alert-danger">
+                <strong>Error:</strong> ${error.message}
+              </div>
+            `;
         }
     });
+
+    function renderResults(data) {
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = '';
+
+        // Group findings by competitor
+        const competitorGroups = data.results.reduce((groups, result) => {
+            if (!groups[result.competitor]) {
+                groups[result.competitor] = {
+                    findings: [],
+                    stats: {
+                        high: 0,
+                        medium: 0,
+                        total: 0
+                    }
+                };
+            }
+            result.findings.forEach(finding => {
+                groups[result.competitor].findings.push(finding);
+                groups[result.competitor].stats.total++;
+                if (finding.confidence === 'High') groups[result.competitor].stats.high++;
+                if (finding.confidence === 'Medium') groups[result.competitor].stats.medium++;
+            });
+            return groups;
+        }, {});
+
+        // Create cards for each competitor
+        Object.entries(competitorGroups).forEach(([competitor, data], index) => {
+            const { findings, stats } = data;
+            const companyId = `competitor-${index}-${competitor.replace(/\s+/g, '-').toLowerCase()}`;
+            
+            const companyCard = document.createElement('div');
+            companyCard.className = 'company-card';
+            
+            companyCard.innerHTML = `
+                <div class="company-header p-3" 
+                     data-bs-toggle="collapse" 
+                     data-bs-target="#${companyId}" 
+                     aria-expanded="false">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">${competitor}</h3>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="badges d-flex gap-2">
+                                <span class="badge bg-success">${stats.high} High</span>
+                                <span class="badge bg-info">${stats.medium} Medium</span>
+                                <span class="badge bg-primary">${stats.total} Total</span>
+                            </div>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse" id="${companyId}">
+                    <div class="findings-stack">
+                        ${findings.map(finding => `
+                            <div class="finding-card position-relative ${finding.confidence.toLowerCase()}-confidence">
+                                <div class="confidence-indicator"></div>
+                                <div class="card-body p-3">
+                                    <h5 class="card-title">${finding.title}</h5>
+                                    <p class="card-text">${finding.snippet}</p>
+                                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-secondary me-2">${finding.relationship}</span>
+                                            <span class="badge bg-secondary">${finding.year}</span>
+                                        </div>
+                                        ${finding.link ? `
+                                            <a href="${finding.link}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                View Source <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(companyCard);
+        });
+
+        // Initialize collapse functionality
+        const collapseElements = document.querySelectorAll('.collapse');
+        collapseElements.forEach(collapse => {
+            const header = collapse.previousElementSibling;
+            new bootstrap.Collapse(collapse, { toggle: false });
+
+            header.addEventListener('click', () => {
+                const isExpanded = header.getAttribute('aria-expanded') === 'true';
+                header.setAttribute('aria-expanded', !isExpanded);
+                header.querySelector('.bi-chevron-down').style.transform = 
+                    isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        });
+    }
   </script>
 </body>
 </html>
