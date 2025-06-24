@@ -1,4 +1,4 @@
-# Infosys Competitor Intelligence Tool
+# IntelliRival
 
 A web application that analyzes which competitors of Infosys have worked with or are currently working with Virgin Media.
 
